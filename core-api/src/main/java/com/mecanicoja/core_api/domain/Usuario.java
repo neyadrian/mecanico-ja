@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data // cria getters e setters automaticamente
 @Entity // diz ao spring que essa entidade vai virar uma tabela no bd
 @Table(name = "usuarios")
-public class Usuarios {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
