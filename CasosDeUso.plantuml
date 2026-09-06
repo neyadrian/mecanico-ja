@@ -1,0 +1,24 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Motorista" as motorista
+actor "Mecânico" as mecanico
+actor "API de IA (LLM)" as ia <<Sistema Externo>>
+
+package "Aplicativo Mecânico Já" {
+  usecase "UC-001: Relatar Problema Veicular" as uc1
+  usecase "UC-002: Solicitar Socorro Mecânico" as uc2
+  usecase "UC-003: Gerenciar Atendimentos" as uc3
+}
+
+motorista --> uc1
+motorista --> uc2
+uc1 <.. ia : <<participa>>
+mecanico --> uc3
+
+note bottom of uc1
+  O relato gera um 
+  pré-diagnóstico via IA
+end note
+@enduml

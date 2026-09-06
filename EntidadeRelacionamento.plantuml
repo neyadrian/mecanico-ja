@@ -1,0 +1,67 @@
+@startuml
+hide circle
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 60
+
+entity "USER" {
+  * id : uuid <<PK>>
+  --
+  nome : string
+  email : string
+  telefone : string
+  senha_hash : string
+  tipo_usuario : string
+  criado_em : datetime
+}
+
+entity "VEHICLE" {
+  * id : uuid <<PK>>
+  --
+  * motorista_id : uuid <<FK>>
+  marca : string
+  modelo : string
+  ano : int
+  tipo_combustivel : string
+}
+
+entity "MECHANIC_PROFILE" {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  especialidades : string
+  raio_atendimento_km : float
+  disponivel : boolean
+  localizacao_atual : geometry
+}
+
+entity "DIAGNOSIS" {
+  * id : uuid <<PK>>
+  --
+  * motorista_id : uuid <<FK>>
+  * veiculo_id : uuid <<FK>>
+  sintomas_relatados : text
+  ia_pre_diagnostico : text
+  criado_em : datetime
+}
+
+entity "ASSISTANCE_CALL" {
+  * id : uuid <<PK>>
+  --
+  * diagnosis_id : uuid <<FK>>
+  * motorista_id : uuid <<FK>>
+  * mecanico_id : uuid <<FK>>
+  status : string
+  criado_em : datetime
+}
+
+' Relacionamentos
+USER ||--o{ VEHICLE : "possui (se motorista)"
+USER ||--o| MECHANIC_PROFILE : "tem (se mecânico)"
+USER ||--o{ DIAGNOSIS : "solicita"
+USER ||--o{ ASSISTANCE_CALL : "participa"
+
+VEHICLE ||--o{ DIAGNOSIS : "referente a"
+DIAGNOSIS ||--o{ ASSISTANCE_CALL : "gera"
+
+@enduml

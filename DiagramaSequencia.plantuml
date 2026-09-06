@@ -1,0 +1,35 @@
+@startuml
+autonumber
+actor "Motorista" as motorista
+participant "App (Mobile)" as app
+participant "API (Backend)" as api
+database "Banco de Dados\n(PostgreSQL + PostGIS)" as db
+actor "Mecânico" as mecanico
+
+motorista -> app: Aciona "Encontrar Mecânico"
+activate app
+
+app -> api: POST /socorro/buscar (localizacao_atual, diagnosis_id)
+activate api
+
+api -> db: Busca espacial (ST_DWithin)\nRaio de 30km + Status=Disponível
+activate db
+db --> api: Retorna lista de Mecânicos compatíveis
+deactivate db
+
+api --> app: Retorna array de Mecânicos
+deactivate api
+
+app --> motorista: Exibe lista com distâncias
+motorista -> app: Seleciona Mecânico e confirma
+app -> api: POST /socorro/solicitar (mecanico_id)
+activate api
+
+api -> db: Insere AssistanceCall (status=PENDENTE)
+api -> mecanico: Envia Notificação Push (Novo Chamado)
+api --> app: Status "Aguardando resposta..."
+deactivate api
+
+app --> motorista: Tela de Espera
+deactivate app
+@enduml
