@@ -16,20 +16,31 @@ public class ChamadoSocorro {
     private UUID id;
 
     @OneToOne
-    @JoinColumn(name = "diagnostico_id")
+    @JoinColumn(name = "diagnostico_id", nullable = false)
     private Diagnostico diagnostico;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @JoinColumn(name = "motorista_id", nullable = false)
     private Usuario motorista;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id",  nullable = false)
+    @JoinColumn(name = "mecanico_id")
     private Usuario mecanico;
 
-    private Enum status {
-        ENDENTE, ACEITO, RECUSADO, CONCLUIDO, CANCELADO;
+    public enum StatusChamado {
+        PENDENTE, ACEITO, RECUSADO, CONCLUIDO, CANCELADO
     }
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusChamado status = StatusChamado.PENDENTE; // nasce como pendente por padrão
+
+    @Column(nullable = false, updatable = false)
     private LocalDateTime criadoEm;
+
+    // preenche a data sozinho quando salva no banco
+    @PrePersist
+    protected void onCreate() {
+        this.criadoEm = LocalDateTime.now();
+    }
 }
