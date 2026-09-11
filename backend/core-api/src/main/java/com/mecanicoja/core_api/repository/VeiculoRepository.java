@@ -8,6 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface VeiculoRepository extends JpaRepository<Veiculo, UUID> {
-    
+
     Optional<Veiculo> findByNome(Veiculo veiculo);
 }
