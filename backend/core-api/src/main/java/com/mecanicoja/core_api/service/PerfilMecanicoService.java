@@ -27,7 +27,7 @@ public class PerfilMecanicoService {
     public PerfilMecanico criarPerfil(UUID usuarioId, PerfilMecanicoRequest request) {
         Usuario mecanico = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Mecânico não encontrado!"));
-        
+
         // mágica do postgis, transformando lat/long em Ponto
         // no sistema de coordenadas, é sempre (Longitude, Latitude) nessa ordem
         Point localizacao = geometryFactory.createPoint(new Coordinate(request.getLongitude(), request.getLatitude()));
