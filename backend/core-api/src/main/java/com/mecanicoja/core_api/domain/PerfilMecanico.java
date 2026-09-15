@@ -1,5 +1,6 @@
 package com.mecanicoja.core_api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.locationtech.jts.geom.Point;
@@ -28,7 +29,9 @@ public class PerfilMecanico {
     @Column(nullable = false)
     private Boolean disponivel = false; // padrão é indisponível
 
+    @JsonIgnore
     // esta coluna usará o PostGIS no banco para buscas ultra-rápidas por raio de distância
     @Column(columnDefinition = "geometry(Point, 4326)")
+
     private Point localizacao;
 }
