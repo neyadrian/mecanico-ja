@@ -5,7 +5,7 @@ from google import genai
 app = FastAPI(title="Mecânico Já - AI Service")
 
 # Inicializa o cliente do Gemini com a sua chave
-GEMINI_API_KEY = "AQ.Ab8RN6K420QMC6YtOHAndZ41fSxHlk0HjFjgkyQpFKXOdcidPA"
+GEMINI_API_KEY = "CHAVE_REMOVIDA_POR_SEGURANCA"
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 class SintomasRequest(BaseModel):
