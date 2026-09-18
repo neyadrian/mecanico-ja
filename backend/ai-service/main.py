@@ -1,23 +1,35 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from google import genai
 
-# Inicializa o servidor web
 app = FastAPI(title="Mecânico Já - AI Service")
 
-# Define o formato do JSON que o Java vai mandar para o Python
+# Inicializa o cliente do Gemini com a sua chave
+GEMINI_API_KEY = "AQ.Ab8RN6K420QMC6YtOHAndZ41fSxHlk0HjFjgkyQpFKXOdcidPA"
+client = genai.Client(api_key=GEMINI_API_KEY)
+
 class SintomasRequest(BaseModel):
     sintomas: str
 
-# Rota que o Java vai chamar
 @app.post("/api/ia/analisar")
 async def analisar_sintomas(request: SintomasRequest):
 
-    sintoma_do_motorista = request.sintomas
+    # Engenharia de Prompt: Dando uma "personalidade" para a nossa IA
+    prompt = f"""
+    Você é um mecânico automotivo especialista de alto nível. 
+    Um motorista relatou o seguinte problema no veículo dele: '{request.sintomas}'.
+    
+    Faça um pré-diagnóstico técnico, curto e direto ao ponto (máximo de 3 linhas), 
+    sugerindo quais sistemas ou peças podem estar com defeito para orientar o mecânico que vai atender o chamado.
+    """
 
-    # TODO: Na próxima etapa vamos plugar o Google Gemini de verdade aqui!
-    # Por enquanto, criamos uma resposta simulada para testar a comunicação.
-    resposta_ia = f"Análise simulada: O sintoma '{sintoma_do_motorista}' geralmente indica problemas na injeção eletrônica ou velas desgastadas. Recomenda-se escaneamento OBD2."
+    # Chama o cérebro do Google Gemini (usando o modelo flash, que é o mais rápido)
+    response = client.models.generate_content(
+        model='gemini-3.6-flash',
+        contents=prompt,
+    )
 
+    # Devolve a resposta inteligente
     return {
-        "pre_diagnostico": resposta_ia
+        "pre_diagnostico": response.text
     }
