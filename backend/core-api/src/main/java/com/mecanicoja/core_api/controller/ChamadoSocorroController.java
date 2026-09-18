@@ -32,4 +32,4 @@ public class ChamadoSocorroController {
         ChamadoSocorro chamado = chamadoService.aceitarChamado(chamadoId, mecanicoId);
         return ResponseEntity.ok(chamado);
     }
-}
+}   
