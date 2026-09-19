@@ -43,4 +43,5 @@ public class ChamadoSocorro {
     protected void onCreate() {
         this.criadoEm = LocalDateTime.now();
     }
+
 }
