@@ -38,7 +38,7 @@ public class ChamadoSocorroService {
         ChamadoSocorro chamado = new ChamadoSocorro();
         chamado.setMotorista(motorista);
         chamado.setDiagnostico(diagnostico);
-        chamado.setStatus(ChamadoSocorro.Status.PENDENTE); // Importante: Verifica como você chamou o Enum de status na sua classe ChamadoSocorro!
+        chamado.setStatus(ChamadoSocorro.StatusChamado.PENDENTE);
         chamado.setCriadoEm(LocalDateTime.now());
         // O mecânico fica VAZIO de propósito, ninguém atendeu ainda.
 
@@ -54,12 +54,12 @@ public class ChamadoSocorroService {
                 .orElseThrow(() -> new RuntimeException("Mecânico não encontrado!"));
 
         // Regra de ouro: Só pode aceitar se estiver PENDENTE
-        if (chamado.getStatus() != ChamadoSocorro.Status.PENDENTE) {
+        if (chamado.getStatus() != ChamadoSocorro.StatusChamado.PENDENTE) {
             throw new RuntimeException("Muito tarde! Este chamado não está mais disponível.");
         }
 
         chamado.setMecanico(mecanico);
-        chamado.setStatus(ChamadoSocorro.Status.ACEITO);
+        chamado.setStatus(ChamadoSocorro.StatusChamado.ACEITO);
 
         return chamadoRepository.save(chamado);
     }
