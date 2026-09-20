@@ -10,4 +10,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     // Spring Boot vai criar o SQL sozinho para buscar um usuário pelo email
     Optional<Usuario> findByEmail(String email);
+
 }
