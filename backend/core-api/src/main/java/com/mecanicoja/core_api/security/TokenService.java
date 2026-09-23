@@ -23,7 +23,7 @@ public class TokenService {
                 .withIssuer("MecanicoJa-API") // Quem emitiu o crachá
                 .withSubject(usuario.getEmail()) // De quem é o crachá (Email)
                 .withClaim("id", usuario.getId().toString()) // Informação extra (ID)
-                .withClaim("tipo", usuario.getTipoUsuario().name()) // Motorista ou Mecânico?
+                .withClaim("tipo", usuario.getTipoUsuario()) // Motorista ou Mecânico?
                 .withExpiresAt(gerarDataExpiracao()) // Data de validade
                 .sign(algoritmo);
     }
