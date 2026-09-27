@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
+from typing import Dict, List
 from google import genai
 import os
 from dotenv import load_dotenv
@@ -38,3 +39,43 @@ async def analisar_sintomas(request: SintomasRequest):
     return {
         "pre_diagnostico": interaction.output_text
     }
+
+# ==========================================
+# FASE 4: WEBSOCKETS (CHAT EM TEMPO REAL)
+# ==========================================
+
+class ConnectionManager:
+    def __init__(self):
+        # Guarda as conexões separadas por "sala" (ID do chamado de socorro)
+        self.active_connections: Dict[str, List[WebSocket]] = {}
+
+    async def connect(self, websocket: WebSocket, chamado_id: str):
+        await websocket.accept()
+        if chamado_id not in self.active_connections:
+            self.active_connections[chamado_id] = []
+        self.active_connections[chamado_id].append(websocket)
+
+    def disconnect(self, websocket: WebSocket, chamado_id: str):
+        self.active_connections[chamado_id].remove(websocket)
+        if not self.active_connections[chamado_id]:
+            del self.active_connections[chamado_id]
+
+    async def broadcast(self, message: str, chamado_id: str):
+        if chamado_id in self.active_connections:
+            for connection in self.active_connections[chamado_id]:
+                await connection.send_text(message)
+
+manager = ConnectionManager()
+
+@app.websocket("/ws/chat/{chamado_id}")
+async def websocket_endpoint(websocket: WebSocket, chamado_id: str):
+    await manager.connect(websocket, chamado_id)
+    try:
+        while True:
+            # Espera receber uma mensagem de texto do aplicativo
+            data = await websocket.receive_text()
+            # Envia a mensagem para a outra pessoa na mesma "sala"
+            await manager.broadcast(f"{data}", chamado_id)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, chamado_id)
+        await manager.broadcast("Sistema: Um usuário saiu do chat de emergência.", chamado_id)
