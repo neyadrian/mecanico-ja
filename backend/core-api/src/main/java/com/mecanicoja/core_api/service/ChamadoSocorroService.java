@@ -7,6 +7,7 @@ import com.mecanicoja.core_api.dto.ChamadoSocorroRequest;
 import com.mecanicoja.core_api.repository.ChamadoSocorroRepository;
 import com.mecanicoja.core_api.repository.DiagnosticoRepository;
 import com.mecanicoja.core_api.repository.UsuarioRepository;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,13 +19,16 @@ public class ChamadoSocorroService {
     private final ChamadoSocorroRepository chamadoRepository;
     private final UsuarioRepository usuarioRepository;
     private final DiagnosticoRepository diagnosticoRepository;
+    private final StringRedisTemplate redisTemplate;
 
     public ChamadoSocorroService(ChamadoSocorroRepository chamadoRepository,
                                  UsuarioRepository usuarioRepository,
-                                 DiagnosticoRepository diagnosticoRepository) {
+                                 DiagnosticoRepository diagnosticoRepository,
+                                 StringRedisTemplate redisTemplate) {
         this.chamadoRepository = chamadoRepository;
         this.usuarioRepository = usuarioRepository;
         this.diagnosticoRepository = diagnosticoRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     // AÇÃO 1: Motorista pede socorro
@@ -61,6 +65,12 @@ public class ChamadoSocorroService {
         chamado.setMecanico(mecanico);
         chamado.setStatus(ChamadoSocorro.StatusChamado.ACEITO);
 
-        return chamadoRepository.save(chamado);
+        ChamadoSocorro chamadoSalvo = chamadoRepository.save(chamado);
+
+        // FASE 4: Avisa o Python via Redis que o chamado foi aceito!
+        // O Python vai escutar este canal e notificar os WebSockets correspondentes.
+        redisTemplate.convertAndSend("canal_chamados", chamadoSalvo.getId().toString() + ":ACEITO");
+
+        return chamadoSalvo;
     }
 }
