@@ -79,3 +79,27 @@ async def websocket_endpoint(websocket: WebSocket, chamado_id: str):
     except WebSocketDisconnect:
         manager.disconnect(websocket, chamado_id)
         await manager.broadcast("Sistema: Um usuário saiu do chat de emergência.", chamado_id)
+
+# ==========================================
+# LISTENER DO REDIS (Recebe do Java)
+# ==========================================
+import redis.asyncio as redis
+import asyncio
+
+async def redis_listener():
+    r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    pubsub = r.pubsub()
+    await pubsub.subscribe("canal_chamados")
+    print("Python conectado ao Redis. Escutando canal_chamados...")
+    async for message in pubsub.listen():
+        if message['type'] == 'message':
+            data = message['data']
+            print(f"Recebido do Java: {data}")
+            # Formato esperado do Java: "chamadoId:ACEITO"
+            if ":ACEITO" in data:
+                chamado_id = data.split(":")[0]
+                await manager.broadcast("Sistema: O mecânico acaba de aceitar o chamado! O chat está aberto.", chamado_id)
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(redis_listener())
