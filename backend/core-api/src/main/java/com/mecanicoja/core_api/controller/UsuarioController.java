@@ -18,12 +18,12 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // usada para criar algo novo
+    // usada para criar algo novo com DTO e hash de senha
     @PostMapping
-    public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario) {
-        Usuario novoUsuario = usuarioService.cadastrarUsuario(usuario);
+    public ResponseEntity<Usuario> cadastrar(@RequestBody com.mecanicoja.core_api.dto.RegistroRequest request) {
+        Usuario novoUsuario = usuarioService.registrarUsuario(request);
 
-        // devolve 201 created e usuário salvo com id
+        // devolve 201 created e usuário salvo com senha criptografada
         return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
     }
 
