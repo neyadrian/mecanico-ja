@@ -32,4 +32,11 @@ public class ChamadoSocorroController {
         ChamadoSocorro chamado = chamadoService.aceitarChamado(chamadoId, mecanicoId);
         return ResponseEntity.ok(chamado);
     }
-}   
+
+    // Rota para cancelar chamado (Atualização = PUT / DELETE semântico)
+    @PutMapping("/{chamadoId}/cancelar")
+    public ResponseEntity<ChamadoSocorro> cancelarChamado(@PathVariable UUID chamadoId) {
+        ChamadoSocorro chamado = chamadoService.cancelarChamado(chamadoId);
+        return ResponseEntity.ok(chamado);
+    }
+}

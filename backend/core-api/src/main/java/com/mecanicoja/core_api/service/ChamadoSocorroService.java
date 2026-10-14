@@ -73,4 +73,26 @@ public class ChamadoSocorroService {
 
         return chamadoSalvo;
     }
+
+    // AÇÃO 3: Motorista ou sistema cancela o chamado
+    public ChamadoSocorro cancelarChamado(UUID chamadoId) {
+        ChamadoSocorro chamado = chamadoRepository.findById(chamadoId)
+                .orElseThrow(() -> new RuntimeException("Chamado não encontrado!"));
+
+        // Regra de negócio: não é possível cancelar chamados já concluídos ou já cancelados
+        if (chamado.getStatus() == ChamadoSocorro.StatusChamado.CONCLUIDO) {
+            throw new RuntimeException("Não é possível cancelar um chamado que já foi concluído!");
+        }
+        if (chamado.getStatus() == ChamadoSocorro.StatusChamado.CANCELADO) {
+            throw new RuntimeException("Este chamado já se encontra cancelado!");
+        }
+
+        chamado.setStatus(ChamadoSocorro.StatusChamado.CANCELADO);
+        ChamadoSocorro chamadoCancelado = chamadoRepository.save(chamado);
+
+        // Notifica via Redis Pub/Sub que o chamado foi cancelado
+        redisTemplate.convertAndSend("canal_chamados", chamadoCancelado.getId().toString() + ":CANCELADO");
+
+        return chamadoCancelado;
+    }
 }

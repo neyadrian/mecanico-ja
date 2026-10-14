@@ -26,11 +26,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
         String mensagem = ex.getMessage() != null ? ex.getMessage() : "Ocorreu um erro inesperado.";
 
-        // Define o status HTTP baseado na mensagem (convencção interna do nosso projeto)
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         if (mensagem.contains("não encontrado") || mensagem.contains("nao encontrado")) {
             status = HttpStatus.NOT_FOUND;
-        } else if (mensagem.contains("Muito tarde") || mensagem.contains("não está mais")) {
+        } else if (mensagem.contains("Muito tarde") || mensagem.contains("não está mais") || mensagem.contains("Não é possível cancelar")) {
             status = HttpStatus.CONFLICT;
         }
 
