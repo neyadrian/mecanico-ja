@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -38,5 +39,31 @@ public class ChamadoSocorroController {
     public ResponseEntity<ChamadoSocorro> cancelarChamado(@PathVariable UUID chamadoId) {
         ChamadoSocorro chamado = chamadoService.cancelarChamado(chamadoId);
         return ResponseEntity.ok(chamado);
+    }
+
+    // Listar todos os chamados com filtro opcional por status (?status=PENDENTE)
+    @GetMapping
+    public ResponseEntity<List<ChamadoSocorro>> listarChamados(
+            @RequestParam(required = false) ChamadoSocorro.StatusChamado status) {
+        List<ChamadoSocorro> chamados = chamadoService.listarChamados(status);
+        return ResponseEntity.ok(chamados);
+    }
+
+    // Listar chamados de um motorista específico (?status=ACEITO)
+    @GetMapping("/motorista/{motoristaId}")
+    public ResponseEntity<List<ChamadoSocorro>> listarPorMotorista(
+            @PathVariable UUID motoristaId,
+            @RequestParam(required = false) ChamadoSocorro.StatusChamado status) {
+        List<ChamadoSocorro> chamados = chamadoService.listarPorMotorista(motoristaId, status);
+        return ResponseEntity.ok(chamados);
+    }
+
+    // Listar chamados de um mecânico específico (?status=CONCLUIDO)
+    @GetMapping("/mecanico/{mecanicoId}")
+    public ResponseEntity<List<ChamadoSocorro>> listarPorMecanico(
+            @PathVariable UUID mecanicoId,
+            @RequestParam(required = false) ChamadoSocorro.StatusChamado status) {
+        List<ChamadoSocorro> chamados = chamadoService.listarPorMecanico(mecanicoId, status);
+        return ResponseEntity.ok(chamados);
     }
 }

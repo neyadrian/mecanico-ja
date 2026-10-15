@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -94,5 +95,35 @@ public class ChamadoSocorroService {
         redisTemplate.convertAndSend("canal_chamados", chamadoCancelado.getId().toString() + ":CANCELADO");
 
         return chamadoCancelado;
+    }
+
+    // LISTAGEM 1: Listar chamados com filtro opcional por status
+    public List<ChamadoSocorro> listarChamados(ChamadoSocorro.StatusChamado status) {
+        if (status != null) {
+            return chamadoRepository.findByStatus(status);
+        }
+        return chamadoRepository.findAll();
+    }
+
+    // LISTAGEM 2: Histórico de chamados de um motorista específico (com filtro opcional por status)
+    public List<ChamadoSocorro> listarPorMotorista(UUID motoristaId, ChamadoSocorro.StatusChamado status) {
+        Usuario motorista = usuarioRepository.findById(motoristaId)
+                .orElseThrow(() -> new RuntimeException("Motorista não encontrado!"));
+
+        if (status != null) {
+            return chamadoRepository.findByMotoristaAndStatus(motorista, status);
+        }
+        return chamadoRepository.findByMotorista(motorista);
+    }
+
+    // LISTAGEM 3: Atendimentos de um mecânico específico (com filtro opcional por status)
+    public List<ChamadoSocorro> listarPorMecanico(UUID mecanicoId, ChamadoSocorro.StatusChamado status) {
+        Usuario mecanico = usuarioRepository.findById(mecanicoId)
+                .orElseThrow(() -> new RuntimeException("Mecânico não encontrado!"));
+
+        if (status != null) {
+            return chamadoRepository.findByMecanicoAndStatus(mecanico, status);
+        }
+        return chamadoRepository.findByMecanico(mecanico);
     }
 }
