@@ -97,6 +97,25 @@ public class ChamadoSocorroService {
         return chamadoCancelado;
     }
 
+    // AÇÃO 4: Mecânico conclui o atendimento do chamado
+    public ChamadoSocorro concluirChamado(UUID chamadoId) {
+        ChamadoSocorro chamado = chamadoRepository.findById(chamadoId)
+                .orElseThrow(() -> new RuntimeException("Chamado não encontrado!"));
+
+        // Regra de negócio: só pode ser concluído se estiver ACEITO
+        if (chamado.getStatus() != ChamadoSocorro.StatusChamado.ACEITO) {
+            throw new RuntimeException("Apenas chamados que estão em andamento (ACEITO) podem ser concluídos!");
+        }
+
+        chamado.setStatus(ChamadoSocorro.StatusChamado.CONCLUIDO);
+        ChamadoSocorro chamadoConcluido = chamadoRepository.save(chamado);
+
+        // Notifica via Redis Pub/Sub que o serviço foi concluído com sucesso
+        redisTemplate.convertAndSend("canal_chamados", chamadoConcluido.getId().toString() + ":CONCLUIDO");
+
+        return chamadoConcluido;
+    }
+
     // LISTAGEM 1: Listar chamados com filtro opcional por status
     public List<ChamadoSocorro> listarChamados(ChamadoSocorro.StatusChamado status) {
         if (status != null) {

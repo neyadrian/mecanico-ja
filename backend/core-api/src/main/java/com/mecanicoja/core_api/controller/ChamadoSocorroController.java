@@ -41,6 +41,13 @@ public class ChamadoSocorroController {
         return ResponseEntity.ok(chamado);
     }
 
+    // Rota para o Mecânico concluir o atendimento (Atualização = PUT)
+    @PutMapping("/{chamadoId}/concluir")
+    public ResponseEntity<ChamadoSocorro> concluirChamado(@PathVariable UUID chamadoId) {
+        ChamadoSocorro chamado = chamadoService.concluirChamado(chamadoId);
+        return ResponseEntity.ok(chamado);
+    }
+
     // Listar todos os chamados com filtro opcional por status (?status=PENDENTE)
     @GetMapping
     public ResponseEntity<List<ChamadoSocorro>> listarChamados(
