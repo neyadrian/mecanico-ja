@@ -13,4 +13,10 @@ public interface ChamadoSocorroRepository extends JpaRepository<ChamadoSocorro, 
     List<ChamadoSocorro> findByMotorista(Usuario motorista);
     // busca os chamados que foram atribuidos a um mecanico específico
     List<ChamadoSocorro> findByMecanico(Usuario mecanico);
+    // busca chamados filtrados por status (ex: listar todos os PENDENTES para o painel de mecânicos)
+    List<ChamadoSocorro> findByStatus(ChamadoSocorro.StatusChamado status);
+    // busca histórico de um motorista por status específico
+    List<ChamadoSocorro> findByMotoristaAndStatus(Usuario motorista, ChamadoSocorro.StatusChamado status);
+    // busca histórico de um mecânico por status específico
+    List<ChamadoSocorro> findByMecanicoAndStatus(Usuario mecanico, ChamadoSocorro.StatusChamado status);
 }
